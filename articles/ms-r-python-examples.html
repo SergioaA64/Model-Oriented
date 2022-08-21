@@ -103,7 +103,7 @@
       <h1 data-toc-skip>modelStudio - R &amp; Python examples</h1>
                         <h4 data-toc-skip class="author">Hubert Baniecki</h4>
             
-            <h4 data-toc-skip class="date">2022-06-01</h4>
+            <h4 data-toc-skip class="date">2022-08-21</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ModelOriented/modelStudio/blob/HEAD/vignettes/ms-r-python-examples.Rmd" class="external-link"><code>vignettes/ms-r-python-examples.Rmd</code></a></small>
       <div class="hidden name"><code>ms-r-python-examples.Rmd</code></div>
@@ -120,282 +120,282 @@
 </h3>
 <p>The <code><a href="../reference/modelStudio.html">modelStudio()</a></code> function uses <code>DALEX</code> explainers created with <code><a href="https://modeloriented.github.io/DALEX/reference/explain.html" class="external-link">DALEX::explain()</a></code> or <code>DALEXtra::explain_*()</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># packages for the explainer objects</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"DALEX"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"DALEXtra"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># packages for the explainer objects</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"DALEX"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"DALEXtra"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="mlr-dashboard">mlr <a href="https://modelstudio.drwhy.ai/mlr.html" class="external-link">dashboard</a><a class="anchor" aria-label="anchor" href="#mlr-dashboard"></a>
 </h4>
 <p>In this example, we make a studio for the <code>ranger</code> model on the <code>apartments</code> data.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># load packages and data</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mlr.mlr-org.com" class="external-link">mlr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ModelOriented.github.io/DALEXtra/" class="external-link">DALEXtra</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span>
-
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">DALEX</span><span class="fu">::</span><span class="va"><a href="https://modeloriented.github.io/DALEX/reference/apartments.html" class="external-link">apartments</a></span>
-
-<span class="co"># split the data</span>
-<span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">0.7</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span>
-<span class="va">train</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">index</span>,<span class="op">]</span>
-<span class="va">test</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">index</span>,<span class="op">]</span>
-
-<span class="co"># fit a model</span>
-<span class="va">task</span> <span class="op">&lt;-</span> <span class="fu">makeRegrTask</span><span class="op">(</span>id <span class="op">=</span> <span class="st">"apartments"</span>, data <span class="op">=</span> <span class="va">train</span>, target <span class="op">=</span> <span class="st">"m2.price"</span><span class="op">)</span>
-<span class="va">learner</span> <span class="op">&lt;-</span> <span class="fu">makeLearner</span><span class="op">(</span><span class="st">"regr.ranger"</span>, predict.type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span>
-<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">train</span><span class="op">(</span><span class="va">learner</span>, <span class="va">task</span><span class="op">)</span>
-
-<span class="co"># create an explainer for the model</span>
-<span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu">explain_mlr</span><span class="op">(</span><span class="va">model</span>,
-                         data <span class="op">=</span> <span class="va">test</span>,
-                         y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">m2.price</span>,
-                         label <span class="op">=</span> <span class="st">"mlr"</span><span class="op">)</span>
-
-<span class="co"># pick observations</span>
-<span class="va">new_observation</span> <span class="op">&lt;-</span> <span class="va">test</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,<span class="op">]</span>
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">new_observation</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id1"</span>, <span class="st">"id2"</span><span class="op">)</span>
-
-<span class="co"># make a studio for the model</span>
-<span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span>, <span class="va">new_observation</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># load packages and data</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mlr.mlr-org.com" class="external-link">mlr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ModelOriented.github.io/DALEXtra/" class="external-link">DALEXtra</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">DALEX</span><span class="fu">::</span><span class="va"><a href="https://modeloriented.github.io/DALEX/reference/apartments.html" class="external-link">apartments</a></span></span>
+<span></span>
+<span><span class="co"># split the data</span></span>
+<span><span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">0.7</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">train</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">index</span>,<span class="op">]</span></span>
+<span><span class="va">test</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">index</span>,<span class="op">]</span></span>
+<span></span>
+<span><span class="co"># fit a model</span></span>
+<span><span class="va">task</span> <span class="op">&lt;-</span> <span class="fu">makeRegrTask</span><span class="op">(</span>id <span class="op">=</span> <span class="st">"apartments"</span>, data <span class="op">=</span> <span class="va">train</span>, target <span class="op">=</span> <span class="st">"m2.price"</span><span class="op">)</span></span>
+<span><span class="va">learner</span> <span class="op">&lt;-</span> <span class="fu">makeLearner</span><span class="op">(</span><span class="st">"regr.ranger"</span>, predict.type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">train</span><span class="op">(</span><span class="va">learner</span>, <span class="va">task</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># create an explainer for the model</span></span>
+<span><span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu">explain_mlr</span><span class="op">(</span><span class="va">model</span>,</span>
+<span>                         data <span class="op">=</span> <span class="va">test</span>,</span>
+<span>                         y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">m2.price</span>,</span>
+<span>                         label <span class="op">=</span> <span class="st">"mlr"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># pick observations</span></span>
+<span><span class="va">new_observation</span> <span class="op">&lt;-</span> <span class="va">test</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,<span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">new_observation</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id1"</span>, <span class="st">"id2"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># make a studio for the model</span></span>
+<span><span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span>, <span class="va">new_observation</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="mlr3-dashboard">mlr3 <a href="https://modelstudio.drwhy.ai/mlr3.html" class="external-link">dashboard</a><a class="anchor" aria-label="anchor" href="#mlr3-dashboard"></a>
 </h4>
 <p>In this example, we make a studio for the <code>ranger</code> model on the <code>titanic</code> data.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># load packages and data</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mlr3.mlr-org.com" class="external-link">mlr3</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mlr3learners.mlr-org.com" class="external-link">mlr3learners</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ModelOriented.github.io/DALEXtra/" class="external-link">DALEXtra</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span>
-
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">DALEX</span><span class="fu">::</span><span class="va"><a href="https://modeloriented.github.io/DALEX/reference/titanic.html" class="external-link">titanic_imputed</a></span>
-
-<span class="co"># split the data</span>
-<span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">0.7</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span>
-<span class="va">train</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">index</span>,<span class="op">]</span>
-<span class="va">test</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">index</span>,<span class="op">]</span>
-
-<span class="co"># mlr3 TaskClassif takes target as factor</span>
-<span class="va">train</span><span class="op">$</span><span class="va">survived</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">train</span><span class="op">$</span><span class="va">survived</span><span class="op">)</span>
-
-<span class="co"># fit a model</span>
-<span class="va">task</span> <span class="op">&lt;-</span> <span class="va">TaskClassif</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>id <span class="op">=</span> <span class="st">"titanic"</span>, backend <span class="op">=</span> <span class="va">train</span>, target <span class="op">=</span> <span class="st">"survived"</span><span class="op">)</span>
-<span class="va">learner</span> <span class="op">&lt;-</span> <span class="fu">lrn</span><span class="op">(</span><span class="st">"classif.ranger"</span>, predict_type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span>
-<span class="va">learner</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span><span class="va">task</span><span class="op">)</span>
-
-<span class="co"># create an explainer for the model</span>
-<span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu">explain_mlr3</span><span class="op">(</span><span class="va">learner</span>,
-                          data <span class="op">=</span> <span class="va">test</span>,
-                          y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">survived</span>,
-                          label <span class="op">=</span> <span class="st">"mlr3"</span><span class="op">)</span>
-
-<span class="co"># pick observations</span>
-<span class="va">new_observation</span> <span class="op">&lt;-</span> <span class="va">test</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,<span class="op">]</span>
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">new_observation</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id1"</span>, <span class="st">"id2"</span><span class="op">)</span>
-
-<span class="co"># make a studio for the model</span>
-<span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span>, <span class="va">new_observation</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># load packages and data</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mlr3.mlr-org.com" class="external-link">mlr3</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mlr3learners.mlr-org.com" class="external-link">mlr3learners</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ModelOriented.github.io/DALEXtra/" class="external-link">DALEXtra</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">DALEX</span><span class="fu">::</span><span class="va"><a href="https://modeloriented.github.io/DALEX/reference/titanic.html" class="external-link">titanic_imputed</a></span></span>
+<span></span>
+<span><span class="co"># split the data</span></span>
+<span><span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">0.7</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">train</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">index</span>,<span class="op">]</span></span>
+<span><span class="va">test</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">index</span>,<span class="op">]</span></span>
+<span></span>
+<span><span class="co"># mlr3 TaskClassif takes target as factor</span></span>
+<span><span class="va">train</span><span class="op">$</span><span class="va">survived</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">train</span><span class="op">$</span><span class="va">survived</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># fit a model</span></span>
+<span><span class="va">task</span> <span class="op">&lt;-</span> <span class="va">TaskClassif</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>id <span class="op">=</span> <span class="st">"titanic"</span>, backend <span class="op">=</span> <span class="va">train</span>, target <span class="op">=</span> <span class="st">"survived"</span><span class="op">)</span></span>
+<span><span class="va">learner</span> <span class="op">&lt;-</span> <span class="fu">lrn</span><span class="op">(</span><span class="st">"classif.ranger"</span>, predict_type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span>
+<span><span class="va">learner</span><span class="op">$</span><span class="fu">train</span><span class="op">(</span><span class="va">task</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># create an explainer for the model</span></span>
+<span><span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu">explain_mlr3</span><span class="op">(</span><span class="va">learner</span>,</span>
+<span>                          data <span class="op">=</span> <span class="va">test</span>,</span>
+<span>                          y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">survived</span>,</span>
+<span>                          label <span class="op">=</span> <span class="st">"mlr3"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># pick observations</span></span>
+<span><span class="va">new_observation</span> <span class="op">&lt;-</span> <span class="va">test</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,<span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">new_observation</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id1"</span>, <span class="st">"id2"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># make a studio for the model</span></span>
+<span><span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span>, <span class="va">new_observation</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="xgboost-dashboard">xgboost <a href="https://modelstudio.drwhy.ai/xgboost.html" class="external-link">dashboard</a><a class="anchor" aria-label="anchor" href="#xgboost-dashboard"></a>
 </h4>
 <p>In this example, we make a studio for the <code>xgboost</code> model on the <code>titanic</code> data.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># load packages and data</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/dmlc/xgboost" class="external-link">xgboost</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modeloriented.github.io/DALEX/" class="external-link">DALEX</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span>
-
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">DALEX</span><span class="fu">::</span><span class="va"><a href="https://modeloriented.github.io/DALEX/reference/titanic.html" class="external-link">titanic_imputed</a></span>
-
-<span class="co"># split the data</span>
-<span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">0.7</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span>
-<span class="va">train</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">index</span>,<span class="op">]</span>
-<span class="va">test</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">index</span>,<span class="op">]</span>
-
-<span class="va">train_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="va">survived</span> <span class="op">~</span><span class="va">.</span><span class="op">-</span><span class="fl">1</span>, <span class="va">train</span><span class="op">)</span>
-<span class="va">test_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="va">survived</span> <span class="op">~</span><span class="va">.</span><span class="op">-</span><span class="fl">1</span>, <span class="va">test</span><span class="op">)</span>
-
-<span class="co"># fit a model</span>
-<span class="va">xgb_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/xgboost/man/xgb.DMatrix.html" class="external-link">xgb.DMatrix</a></span><span class="op">(</span><span class="va">train_matrix</span>, label <span class="op">=</span> <span class="va">train</span><span class="op">$</span><span class="va">survived</span><span class="op">)</span>
-<span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>max_depth <span class="op">=</span> <span class="fl">3</span>, objective <span class="op">=</span> <span class="st">"binary:logistic"</span>, eval_metric <span class="op">=</span> <span class="st">"auc"</span><span class="op">)</span>
-<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/xgboost/man/xgb.train.html" class="external-link">xgb.train</a></span><span class="op">(</span><span class="va">params</span>, <span class="va">xgb_matrix</span>, nrounds <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>
-
-<span class="co"># create an explainer for the model</span>
-<span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://modeloriented.github.io/DALEX/reference/explain.html" class="external-link">explain</a></span><span class="op">(</span><span class="va">model</span>,
-                     data <span class="op">=</span> <span class="va">test_matrix</span>,
-                     y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">survived</span>,
-                     type <span class="op">=</span> <span class="st">"classification"</span>,
-                     label <span class="op">=</span> <span class="st">"xgboost"</span><span class="op">)</span>
-
-<span class="co"># pick observations</span>
-<span class="va">new_observation</span> <span class="op">&lt;-</span> <span class="va">test_matrix</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop<span class="op">=</span><span class="cn">FALSE</span><span class="op">]</span>
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">new_observation</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id1"</span>, <span class="st">"id2"</span><span class="op">)</span>
-
-<span class="co"># make a studio for the model</span>
-<span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span>, <span class="va">new_observation</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># load packages and data</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/dmlc/xgboost" class="external-link">xgboost</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modeloriented.github.io/DALEX/" class="external-link">DALEX</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">DALEX</span><span class="fu">::</span><span class="va"><a href="https://modeloriented.github.io/DALEX/reference/titanic.html" class="external-link">titanic_imputed</a></span></span>
+<span></span>
+<span><span class="co"># split the data</span></span>
+<span><span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">0.7</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">train</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">index</span>,<span class="op">]</span></span>
+<span><span class="va">test</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">index</span>,<span class="op">]</span></span>
+<span></span>
+<span><span class="va">train_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="va">survived</span> <span class="op">~</span><span class="va">.</span><span class="op">-</span><span class="fl">1</span>, <span class="va">train</span><span class="op">)</span></span>
+<span><span class="va">test_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="va">survived</span> <span class="op">~</span><span class="va">.</span><span class="op">-</span><span class="fl">1</span>, <span class="va">test</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># fit a model</span></span>
+<span><span class="va">xgb_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/xgboost/man/xgb.DMatrix.html" class="external-link">xgb.DMatrix</a></span><span class="op">(</span><span class="va">train_matrix</span>, label <span class="op">=</span> <span class="va">train</span><span class="op">$</span><span class="va">survived</span><span class="op">)</span></span>
+<span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>max_depth <span class="op">=</span> <span class="fl">3</span>, objective <span class="op">=</span> <span class="st">"binary:logistic"</span>, eval_metric <span class="op">=</span> <span class="st">"auc"</span><span class="op">)</span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/xgboost/man/xgb.train.html" class="external-link">xgb.train</a></span><span class="op">(</span><span class="va">params</span>, <span class="va">xgb_matrix</span>, nrounds <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># create an explainer for the model</span></span>
+<span><span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://modeloriented.github.io/DALEX/reference/explain.html" class="external-link">explain</a></span><span class="op">(</span><span class="va">model</span>,</span>
+<span>                     data <span class="op">=</span> <span class="va">test_matrix</span>,</span>
+<span>                     y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">survived</span>,</span>
+<span>                     type <span class="op">=</span> <span class="st">"classification"</span>,</span>
+<span>                     label <span class="op">=</span> <span class="st">"xgboost"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># pick observations</span></span>
+<span><span class="va">new_observation</span> <span class="op">&lt;-</span> <span class="va">test_matrix</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, , drop<span class="op">=</span><span class="cn">FALSE</span><span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">new_observation</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id1"</span>, <span class="st">"id2"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># make a studio for the model</span></span>
+<span><span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span>, <span class="va">new_observation</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="caret-dashboard">caret <a href="https://modelstudio.drwhy.ai/caret.html" class="external-link">dashboard</a><a class="anchor" aria-label="anchor" href="#caret-dashboard"></a>
 </h4>
 <p>In this example, we make a studio for the <code>gbm</code> model on the <code>titanic</code> data.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># load packages and data</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/" class="external-link">caret</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modeloriented.github.io/DALEX/" class="external-link">DALEX</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span>
-
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">DALEX</span><span class="fu">::</span><span class="va"><a href="https://modeloriented.github.io/DALEX/reference/titanic.html" class="external-link">titanic_imputed</a></span>
-
-<span class="co"># split the data</span>
-<span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">0.7</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span>
-<span class="va">train</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">index</span>,<span class="op">]</span>
-<span class="va">test</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">index</span>,<span class="op">]</span>
-
-<span class="co"># caret train takes target as factor</span>
-<span class="va">train</span><span class="op">$</span><span class="va">survived</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">train</span><span class="op">$</span><span class="va">survived</span><span class="op">)</span>
-
-<span class="co"># fit a model</span>
-<span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu">trainControl</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"repeatedcv"</span>, number <span class="op">=</span> <span class="fl">3</span>, repeats <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>
-<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">train</span><span class="op">(</span><span class="va">survived</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">train</span>, method <span class="op">=</span> <span class="st">"gbm"</span>, trControl <span class="op">=</span> <span class="va">cv</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="co"># create an explainer for the model</span>
-<span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://modeloriented.github.io/DALEX/reference/explain.html" class="external-link">explain</a></span><span class="op">(</span><span class="va">model</span>,
-                     data <span class="op">=</span> <span class="va">test</span>,
-                     y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">survived</span>,
-                     label <span class="op">=</span> <span class="st">"caret"</span><span class="op">)</span>
-
-<span class="co"># pick observations</span>
-<span class="va">new_observation</span> <span class="op">&lt;-</span> <span class="va">test</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,<span class="op">]</span>
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">new_observation</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id1"</span>, <span class="st">"id2"</span><span class="op">)</span>
-
-<span class="co"># make a studio for the model</span>
-<span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span>, <span class="va">new_observation</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># load packages and data</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/" class="external-link">caret</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modeloriented.github.io/DALEX/" class="external-link">DALEX</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">DALEX</span><span class="fu">::</span><span class="va"><a href="https://modeloriented.github.io/DALEX/reference/titanic.html" class="external-link">titanic_imputed</a></span></span>
+<span></span>
+<span><span class="co"># split the data</span></span>
+<span><span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">0.7</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">train</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">index</span>,<span class="op">]</span></span>
+<span><span class="va">test</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">index</span>,<span class="op">]</span></span>
+<span></span>
+<span><span class="co"># caret train takes target as factor</span></span>
+<span><span class="va">train</span><span class="op">$</span><span class="va">survived</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">train</span><span class="op">$</span><span class="va">survived</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># fit a model</span></span>
+<span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu">trainControl</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"repeatedcv"</span>, number <span class="op">=</span> <span class="fl">3</span>, repeats <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">train</span><span class="op">(</span><span class="va">survived</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">train</span>, method <span class="op">=</span> <span class="st">"gbm"</span>, trControl <span class="op">=</span> <span class="va">cv</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># create an explainer for the model</span></span>
+<span><span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://modeloriented.github.io/DALEX/reference/explain.html" class="external-link">explain</a></span><span class="op">(</span><span class="va">model</span>,</span>
+<span>                     data <span class="op">=</span> <span class="va">test</span>,</span>
+<span>                     y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">survived</span>,</span>
+<span>                     label <span class="op">=</span> <span class="st">"caret"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># pick observations</span></span>
+<span><span class="va">new_observation</span> <span class="op">&lt;-</span> <span class="va">test</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,<span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">new_observation</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id1"</span>, <span class="st">"id2"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># make a studio for the model</span></span>
+<span><span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span>, <span class="va">new_observation</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="h2o-dashboard">h2o <a href="https://modelstudio.drwhy.ai/h2o.html" class="external-link">dashboard</a><a class="anchor" aria-label="anchor" href="#h2o-dashboard"></a>
 </h4>
 <p>In this example, we make a studio for the <code>h2o.automl</code> model on the <code>titanic</code> data.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># load packages and data</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/h2oai/h2o-3" class="external-link">h2o</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ModelOriented.github.io/DALEXtra/" class="external-link">DALEXtra</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span>
-
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">DALEX</span><span class="fu">::</span><span class="va"><a href="https://modeloriented.github.io/DALEX/reference/titanic.html" class="external-link">titanic_imputed</a></span>
-
-<span class="co"># init h2o</span>
-<span class="fu">h2o.init</span><span class="op">(</span><span class="op">)</span>
-<span class="fu">h2o.no_progress</span><span class="op">(</span><span class="op">)</span>
-
-<span class="co"># split the data</span>
-<span class="va">h2o_split</span> <span class="op">&lt;-</span> <span class="fu">h2o.splitFrame</span><span class="op">(</span><span class="fu">as.h2o</span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span>
-<span class="va">train</span> <span class="op">&lt;-</span> <span class="va">h2o_split</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>
-<span class="va">test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">h2o_split</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>
-
-<span class="co"># h2o automl takes target as factor</span>
-<span class="va">train</span><span class="op">$</span><span class="va">survived</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">train</span><span class="op">$</span><span class="va">survived</span><span class="op">)</span>
-
-<span class="co"># fit a model</span>
-<span class="va">automl</span> <span class="op">&lt;-</span> <span class="fu">h2o.automl</span><span class="op">(</span>y <span class="op">=</span> <span class="st">"survived"</span>, training_frame <span class="op">=</span> <span class="va">train</span>, max_runtime_secs <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>
-<span class="va">model</span> <span class="op">&lt;-</span> <span class="va">automl</span><span class="op">@</span><span class="va">leader</span>
-
-<span class="co"># create an explainer for the model</span>
-<span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu">explain_h2o</span><span class="op">(</span><span class="va">model</span>,
-                         data <span class="op">=</span> <span class="va">test</span>,
-                         y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">survived</span>,
-                         label <span class="op">=</span> <span class="st">"h2o"</span><span class="op">)</span>
-
-<span class="co"># pick observations</span>
-<span class="va">new_observation</span> <span class="op">&lt;-</span> <span class="va">test</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,<span class="op">]</span>
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">new_observation</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id1"</span>, <span class="st">"id2"</span><span class="op">)</span>
-
-<span class="co"># make a studio for the model</span>
-<span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span>, <span class="va">new_observation</span>,
-            B <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
-
-<span class="co"># shutdown h2o</span>
-<span class="fu">h2o.shutdown</span><span class="op">(</span>prompt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># load packages and data</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/h2oai/h2o-3" class="external-link">h2o</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ModelOriented.github.io/DALEXtra/" class="external-link">DALEXtra</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">DALEX</span><span class="fu">::</span><span class="va"><a href="https://modeloriented.github.io/DALEX/reference/titanic.html" class="external-link">titanic_imputed</a></span></span>
+<span></span>
+<span><span class="co"># init h2o</span></span>
+<span><span class="fu">h2o.init</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">h2o.no_progress</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># split the data</span></span>
+<span><span class="va">h2o_split</span> <span class="op">&lt;-</span> <span class="fu">h2o.splitFrame</span><span class="op">(</span><span class="fu">as.h2o</span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">train</span> <span class="op">&lt;-</span> <span class="va">h2o_split</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="va">test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">h2o_split</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># h2o automl takes target as factor</span></span>
+<span><span class="va">train</span><span class="op">$</span><span class="va">survived</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">train</span><span class="op">$</span><span class="va">survived</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># fit a model</span></span>
+<span><span class="va">automl</span> <span class="op">&lt;-</span> <span class="fu">h2o.automl</span><span class="op">(</span>y <span class="op">=</span> <span class="st">"survived"</span>, training_frame <span class="op">=</span> <span class="va">train</span>, max_runtime_secs <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="va">automl</span><span class="op">@</span><span class="va">leader</span></span>
+<span></span>
+<span><span class="co"># create an explainer for the model</span></span>
+<span><span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu">explain_h2o</span><span class="op">(</span><span class="va">model</span>,</span>
+<span>                         data <span class="op">=</span> <span class="va">test</span>,</span>
+<span>                         y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">survived</span>,</span>
+<span>                         label <span class="op">=</span> <span class="st">"h2o"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># pick observations</span></span>
+<span><span class="va">new_observation</span> <span class="op">&lt;-</span> <span class="va">test</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,<span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">new_observation</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id1"</span>, <span class="st">"id2"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># make a studio for the model</span></span>
+<span><span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span>, <span class="va">new_observation</span>,</span>
+<span>            B <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># shutdown h2o</span></span>
+<span><span class="fu">h2o.shutdown</span><span class="op">(</span>prompt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="parsnip-dashboard">parsnip <a href="https://modelstudio.drwhy.ai/parsnip.html" class="external-link">dashboard</a><a class="anchor" aria-label="anchor" href="#parsnip-dashboard"></a>
 </h4>
 <p>In this example, we make a studio for the <code>ranger</code> model on the <code>apartments</code> data.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># load packages and data</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modeloriented.github.io/DALEX/" class="external-link">DALEX</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span>
-
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">DALEX</span><span class="fu">::</span><span class="va"><a href="https://modeloriented.github.io/DALEX/reference/apartments.html" class="external-link">apartments</a></span>
-
-<span class="co"># split the data</span>
-<span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">0.7</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span>
-<span class="va">train</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">index</span>,<span class="op">]</span>
-<span class="va">test</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">index</span>,<span class="op">]</span>
-
-<span class="co"># fit a model</span>
-<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">rand_forest</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-         <span class="fu">set_engine</span><span class="op">(</span><span class="st">"ranger"</span>, importance <span class="op">=</span> <span class="st">"impurity"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-         <span class="fu">set_mode</span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-         <span class="fu">fit</span><span class="op">(</span><span class="va">m2.price</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">train</span><span class="op">)</span>
-
-<span class="co"># create an explainer for the model</span>
-<span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://modeloriented.github.io/DALEX/reference/explain.html" class="external-link">explain</a></span><span class="op">(</span><span class="va">model</span>,
-                     data <span class="op">=</span> <span class="va">test</span>,
-                     y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">m2.price</span>,
-                     label <span class="op">=</span> <span class="st">"parsnip"</span><span class="op">)</span>
-
-<span class="co"># make a studio for the model</span>
-<span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># load packages and data</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modeloriented.github.io/DALEX/" class="external-link">DALEX</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">DALEX</span><span class="fu">::</span><span class="va"><a href="https://modeloriented.github.io/DALEX/reference/apartments.html" class="external-link">apartments</a></span></span>
+<span></span>
+<span><span class="co"># split the data</span></span>
+<span><span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">0.7</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">train</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">index</span>,<span class="op">]</span></span>
+<span><span class="va">test</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">index</span>,<span class="op">]</span></span>
+<span></span>
+<span><span class="co"># fit a model</span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">rand_forest</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>         <span class="fu">set_engine</span><span class="op">(</span><span class="st">"ranger"</span>, importance <span class="op">=</span> <span class="st">"impurity"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>         <span class="fu">set_mode</span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>         <span class="fu">fit</span><span class="op">(</span><span class="va">m2.price</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">train</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># create an explainer for the model</span></span>
+<span><span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://modeloriented.github.io/DALEX/reference/explain.html" class="external-link">explain</a></span><span class="op">(</span><span class="va">model</span>,</span>
+<span>                     data <span class="op">=</span> <span class="va">test</span>,</span>
+<span>                     y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">m2.price</span>,</span>
+<span>                     label <span class="op">=</span> <span class="st">"parsnip"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># make a studio for the model</span></span>
+<span><span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="tidymodels-dashboard">tidymodels <a href="https://modelstudio.drwhy.ai/tidymodels.html" class="external-link">dashboard</a><a class="anchor" aria-label="anchor" href="#tidymodels-dashboard"></a>
 </h4>
 <p>In this example, we make a studio for the <code>ranger</code> model on the <code>titanic</code> data.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># load packages and data</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidymodels.tidymodels.org" class="external-link">tidymodels</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ModelOriented.github.io/DALEXtra/" class="external-link">DALEXtra</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span>
-
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">DALEX</span><span class="fu">::</span><span class="va"><a href="https://modeloriented.github.io/DALEX/reference/titanic.html" class="external-link">titanic_imputed</a></span>
-
-<span class="co"># split the data</span>
-<span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">0.7</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span>
-<span class="va">train</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">index</span>,<span class="op">]</span>
-<span class="va">test</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">index</span>,<span class="op">]</span>
-
-<span class="co"># tidymodels fit takes target as factor</span>
-<span class="va">train</span><span class="op">$</span><span class="va">survived</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">train</span><span class="op">$</span><span class="va">survived</span><span class="op">)</span>
-
-<span class="co"># fit a model</span>
-<span class="va">rec</span> <span class="op">&lt;-</span> <span class="fu">recipe</span><span class="op">(</span><span class="va">survived</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">train</span><span class="op">)</span> <span class="op">%&gt;%</span>
-       <span class="fu">step_normalize</span><span class="op">(</span><span class="va">fare</span><span class="op">)</span>
-
-<span class="va">clf</span> <span class="op">&lt;-</span> <span class="fu">rand_forest</span><span class="op">(</span>mtry <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">%&gt;%</span>
-       <span class="fu">set_engine</span><span class="op">(</span><span class="st">"ranger"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-       <span class="fu">set_mode</span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span>
-
-<span class="va">wflow</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-         <span class="fu">add_recipe</span><span class="op">(</span><span class="va">rec</span><span class="op">)</span> <span class="op">%&gt;%</span>
-         <span class="fu">add_model</span><span class="op">(</span><span class="va">clf</span><span class="op">)</span>
-
-<span class="va">model</span> <span class="op">&lt;-</span> <span class="va">wflow</span> <span class="op">%&gt;%</span> <span class="fu">fit</span><span class="op">(</span>data <span class="op">=</span> <span class="va">train</span><span class="op">)</span>
-
-<span class="co"># create an explainer for the model</span>
-<span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu">explain_tidymodels</span><span class="op">(</span><span class="va">model</span>,
-                                data <span class="op">=</span> <span class="va">test</span>,
-                                y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">survived</span>,
-                                label <span class="op">=</span> <span class="st">"tidymodels"</span><span class="op">)</span>
-
-<span class="co"># pick observations</span>
-<span class="va">new_observation</span> <span class="op">&lt;-</span> <span class="va">test</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,<span class="op">]</span>
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">new_observation</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id1"</span>, <span class="st">"id2"</span><span class="op">)</span>
-
-<span class="co"># make a studio for the model</span>
-<span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span>, <span class="va">new_observation</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># load packages and data</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidymodels.tidymodels.org" class="external-link">tidymodels</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ModelOriented.github.io/DALEXtra/" class="external-link">DALEXtra</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">DALEX</span><span class="fu">::</span><span class="va"><a href="https://modeloriented.github.io/DALEX/reference/titanic.html" class="external-link">titanic_imputed</a></span></span>
+<span></span>
+<span><span class="co"># split the data</span></span>
+<span><span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="fl">0.7</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">train</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">index</span>,<span class="op">]</span></span>
+<span><span class="va">test</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">index</span>,<span class="op">]</span></span>
+<span></span>
+<span><span class="co"># tidymodels fit takes target as factor</span></span>
+<span><span class="va">train</span><span class="op">$</span><span class="va">survived</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">train</span><span class="op">$</span><span class="va">survived</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># fit a model</span></span>
+<span><span class="va">rec</span> <span class="op">&lt;-</span> <span class="fu">recipe</span><span class="op">(</span><span class="va">survived</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">train</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>       <span class="fu">step_normalize</span><span class="op">(</span><span class="va">fare</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">clf</span> <span class="op">&lt;-</span> <span class="fu">rand_forest</span><span class="op">(</span>mtry <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>       <span class="fu">set_engine</span><span class="op">(</span><span class="st">"ranger"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>       <span class="fu">set_mode</span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">wflow</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>         <span class="fu">add_recipe</span><span class="op">(</span><span class="va">rec</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>         <span class="fu">add_model</span><span class="op">(</span><span class="va">clf</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="va">wflow</span> <span class="op">%&gt;%</span> <span class="fu">fit</span><span class="op">(</span>data <span class="op">=</span> <span class="va">train</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># create an explainer for the model</span></span>
+<span><span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu">explain_tidymodels</span><span class="op">(</span><span class="va">model</span>,</span>
+<span>                                data <span class="op">=</span> <span class="va">test</span>,</span>
+<span>                                y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">survived</span>,</span>
+<span>                                label <span class="op">=</span> <span class="st">"tidymodels"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># pick observations</span></span>
+<span><span class="va">new_observation</span> <span class="op">&lt;-</span> <span class="va">test</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,<span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">new_observation</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id1"</span>, <span class="st">"id2"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># make a studio for the model</span></span>
+<span><span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span>, <span class="va">new_observation</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -406,8 +406,8 @@
 <span id="cb9-2"><a href="#cb9-2"></a><span class="ex">pip</span> install dalex -U</span></code></pre></div>
 <p>Use <code>pickle</code> Python module and <code>reticulate</code> R package to easily make a studio for a model.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># package for pickle load</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"reticulate"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># package for pickle load</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"reticulate"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="scikit-learn-dashboard">scikit-learn <a href="https://modelstudio.drwhy.ai/scikitlearn.html" class="external-link">dashboard</a><a class="anchor" aria-label="anchor" href="#scikit-learn-dashboard"></a>
 </h4>
@@ -439,13 +439,13 @@
 <span id="cb11-24"><a href="#cb11-24"></a>explainer.dump(<span class="bu">open</span>(<span class="st">'explainer_scikitlearn.pickle'</span>, <span class="st">'wb'</span>))</span></code></pre></div>
 <p>Then, use <code>modelStudio</code> in R:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># load the explainer from the pickle file</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a></span><span class="op">)</span>
-<span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu">py_load_object</span><span class="op">(</span><span class="st">"explainer_scikitlearn.pickle"</span>, pickle <span class="op">=</span> <span class="st">"pickle"</span><span class="op">)</span>
-
-<span class="co"># make a studio for the model</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span>
-<span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span>, B <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># load the explainer from the pickle file</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a></span><span class="op">)</span></span>
+<span><span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu">py_load_object</span><span class="op">(</span><span class="st">"explainer_scikitlearn.pickle"</span>, pickle <span class="op">=</span> <span class="st">"pickle"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># make a studio for the model</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span>, B <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="lightgbm-dashboard">lightgbm <a href="https://modelstudio.drwhy.ai/lightgbm.html" class="external-link">dashboard</a><a class="anchor" aria-label="anchor" href="#lightgbm-dashboard"></a>
@@ -508,13 +508,13 @@
 <span id="cb13-54"><a href="#cb13-54"></a>explainer.dump(<span class="bu">open</span>(<span class="st">'explainer_lightgbm.pickle'</span>, <span class="st">'wb'</span>)) </span></code></pre></div>
 <p>Then, use <code>modelStudio</code> in R:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># load the explainer from the pickle file</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a></span><span class="op">)</span>
-<span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu">py_load_object</span><span class="op">(</span><span class="st">"explainer_lightgbm.pickle"</span>, pickle <span class="op">=</span> <span class="st">"pickle"</span><span class="op">)</span>
-
-<span class="co"># make a studio for the model</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span>
-<span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># load the explainer from the pickle file</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a></span><span class="op">)</span></span>
+<span><span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu">py_load_object</span><span class="op">(</span><span class="st">"explainer_lightgbm.pickle"</span>, pickle <span class="op">=</span> <span class="st">"pickle"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># make a studio for the model</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="kerastensorflow-dashboard">keras/tensorflow <a href="https://modelstudio.drwhy.ai/keras.html" class="external-link">dashboard</a><a class="anchor" aria-label="anchor" href="#kerastensorflow-dashboard"></a>
@@ -588,20 +588,20 @@
 <span id="cb15-65"><a href="#cb15-65"></a>explainer.dump(<span class="bu">open</span>(<span class="st">'explainer_keras.pickle'</span>, <span class="st">'wb'</span>))</span></code></pre></div>
 <p>Then, use <code>modelStudio</code> in R:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># load the explainer from the pickle file</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a></span><span class="op">)</span>
-
-<span class="co">#! add blank create_architecture function before load !</span>
-<span class="fu">py_run_string</span><span class="op">(</span><span class="st">'
-def create_architecture():
-    return True
-'</span><span class="op">)</span>
-
-<span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu">py_load_object</span><span class="op">(</span><span class="st">"explainer_keras.pickle"</span>, pickle <span class="op">=</span> <span class="st">"pickle"</span><span class="op">)</span>
-
-<span class="co"># make a studio for the model</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span>
-<span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># load the explainer from the pickle file</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#! add blank create_architecture function before load !</span></span>
+<span><span class="fu">py_run_string</span><span class="op">(</span><span class="st">'</span></span>
+<span><span class="st">def create_architecture():</span></span>
+<span><span class="st">    return True</span></span>
+<span><span class="st">'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">explainer</span> <span class="op">&lt;-</span> <span class="fu">py_load_object</span><span class="op">(</span><span class="st">"explainer_keras.pickle"</span>, pickle <span class="op">=</span> <span class="st">"pickle"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># make a studio for the model</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modelstudio.drwhy.ai" class="external-link">modelStudio</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/modelStudio.html">modelStudio</a></span><span class="op">(</span><span class="va">explainer</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 </div>
